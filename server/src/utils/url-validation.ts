@@ -43,7 +43,8 @@ export async function validateUrlNotInternal(url: string): Promise<void> {
       `URL scheme "${parsed.protocol}" is not allowed. Only http and https are permitted.`,
     );
   }
-  const hostname = parsed.hostname;
+  // Strip brackets from IPv6 addresses (URL.hostname includes them)
+  const hostname = parsed.hostname.replace(/^\[|\]$/g, "");
   // Check if hostname is already an IP
   if (net.isIP(hostname)) {
     if (isBlockedIP(hostname)) {
