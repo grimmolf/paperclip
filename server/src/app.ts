@@ -56,6 +56,17 @@ export async function createApp(
     allowedHostnames: opts.allowedHostnames,
     bindHost: opts.bindHost,
   });
+
+  app.use(
+    "/api/health",
+    healthRoutes(db, {
+      deploymentMode: opts.deploymentMode,
+      deploymentExposure: opts.deploymentExposure,
+      authReady: opts.authReady,
+      companyDeletionEnabled: opts.companyDeletionEnabled,
+    }),
+  );
+
   app.use(
     privateHostnameGuard({
       enabled: privateHostnameGateEnabled,
@@ -94,16 +105,7 @@ export async function createApp(
   // Mount API routes
   const api = Router();
   api.use(boardMutationGuard(opts.trustedOrigins));
-  api.use(
-    "/health",
-    healthRoutes(db, {
-      deploymentMode: opts.deploymentMode,
-      deploymentExposure: opts.deploymentExposure,
-      authReady: opts.authReady,
-      companyDeletionEnabled: opts.companyDeletionEnabled,
-    }),
-  );
-  api.use("/companies", companyRoutes(db));
+api.use("/companies", companyRoutes(db));
   api.use(agentRoutes(db));
   api.use(assetRoutes(db, opts.storageService));
   api.use(projectRoutes(db));
